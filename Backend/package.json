@@ -7,17 +7,25 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "probe": "ts-node -r tsconfig-paths/register src/infrastructure/server/devProbe.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^24.10.0",
+    "@types/pg": "^8.15.6",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
     "eslint": "^9.39.1",
     "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "pg": "^8.16.3"
   }
 }
