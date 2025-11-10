@@ -4,6 +4,9 @@ import { makePostgresRouteRepository } from "@/adapters/outbound/postgres";
 import { createListRoutes, createComputeComparison, createSetBaseline } from "@/core/application";
 import type { Route } from "@/core/domain";
 
+console.log("DATABASE_URL =", process.env.DATABASE_URL || "(undefined)");
+
+
 async function main() {
   const pool = getPool();
   const repo = makePostgresRouteRepository(pool);

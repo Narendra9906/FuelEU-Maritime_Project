@@ -4,7 +4,6 @@ import { InfraError, NotFoundError } from "../../../core/shared";
 import { getPool, withTransaction } from "../../../infrastructure/db/pool";
 import { Pool } from "pg";
 
-
 function mapRow(r: any): Route {
   return {
     id: r.id,
@@ -26,11 +25,12 @@ export function makePostgresRouteRepository(pool: Pool = getPool()): RouteReposi
       try {
         const { rows } = await pool.query(
           `SELECT id, route_id, vessel_type, fuel_type, year, ghg_intensity,
-                  fuel_tons, distance_km, total_emis_t, is_baseline
-             FROM routes;`
+              fuel_tons, distance_km, total_emis_t, is_baseline
+         FROM routes;`,
         );
         return rows.map(mapRow);
       } catch (e: any) {
+        console.error("🔥 findAll() PG error:", e); // 👈 TEMP DEBUG LINE
         throw new InfraError(e?.message ?? "findAll failed");
       }
     },
@@ -42,7 +42,7 @@ export function makePostgresRouteRepository(pool: Pool = getPool()): RouteReposi
                   fuel_tons, distance_km, total_emis_t, is_baseline
              FROM routes
             WHERE id = $1;`,
-          [id]
+          [id],
         );
         if (rows.length === 0) return null;
         return mapRow(rows[0]);
@@ -57,7 +57,7 @@ export function makePostgresRouteRepository(pool: Pool = getPool()): RouteReposi
           `SELECT id, route_id, vessel_type, fuel_type, year, ghg_intensity,
                   fuel_tons, distance_km, total_emis_t, is_baseline
              FROM routes
-            WHERE is_baseline = TRUE;`
+            WHERE is_baseline = TRUE;`,
         );
         if (rows.length === 0) return null;
         return mapRow(rows[0]);
@@ -70,10 +70,9 @@ export function makePostgresRouteRepository(pool: Pool = getPool()): RouteReposi
       try {
         await withTransaction(async (client) => {
           await client.query(`UPDATE routes SET is_baseline = FALSE WHERE is_baseline = TRUE;`);
-          const res = await client.query(
-            `UPDATE routes SET is_baseline = TRUE WHERE id = $1;`,
-            [id]
-          );
+          const res = await client.query(`UPDATE routes SET is_baseline = TRUE WHERE id = $1;`, [
+            id,
+          ]);
           if (res.rowCount === 0) {
             throw new NotFoundError("route");
           }
