@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useMemo, useState } from "react";
+import { Tabs } from "./adapters/ui/components/Tabs";
+import { makeApiClient } from "./adapters/infrastructure/ApiClientHttp";
+import { RoutesTab } from "./adapters/ui/RoutesTab";
+import { CompareTab } from "./adapters/ui/CompareTab";
+import { BankingTab } from "./adapters/ui/BankingTab";
+import { PoolingTab } from "./adapters/ui/PoolingTab";
+
+type TabKey = "routes" | "compare" | "banking" | "pooling";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [tab, setTab] = useState<TabKey>("routes");
+  const api = useMemo(() => makeApiClient(), []);
+
+  const tabs = [
+    { key: "routes", label: "Routes" },
+    { key: "compare", label: "Compare" },
+    { key: "banking", label: "Banking" },
+    { key: "pooling", label: "Pooling" },
+  ];
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen bg-white text-gray-900">
+      <header className="border-b p-4">
+        <h1 className="text-xl font-semibold">Fuel EU Compliance Dashboard</h1>
+        <p className="text-sm text-gray-600">Frontend (React + Tailwind) — Hexagonal adapters</p>
+      </header>
+
+      <main className="max-w-6xl mx-auto p-4">
+        <Tabs tabs={tabs} active={tab} onChange={(k) => setTab(k as TabKey)} />
+
+        {tab === "routes" && <RoutesTab api={api} />}
+        {tab === "compare" && <CompareTab api={api} />}
+        {tab === "banking" && <BankingTab />}
+        {tab === "pooling" && <PoolingTab />}
+      </main>
+
+      <footer className="p-4 text-xs text-gray-500 text-center">
+        API Base: {import.meta.env.VITE_API_BASE_URL || "http://localhost:4000"}
+      </footer>
+    </div>
+  );
 }
 
-export default App
+export default App;
