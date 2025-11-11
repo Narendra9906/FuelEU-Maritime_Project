@@ -8,6 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
     "format": "prettier . --write",
+  "db:up": "docker-compose up -d db",
+  "db:down": "docker-compose down",
     "probe": "ts-node -r tsconfig-paths/register src/infrastructure/server/devProbe.ts",
     "dev": "ts-node -r tsconfig-paths/register src/infrastructure/server/index.ts"
   },

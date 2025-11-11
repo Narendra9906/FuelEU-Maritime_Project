@@ -10,6 +10,15 @@ console.log("DATABASE_URL =", process.env.DATABASE_URL || "(undefined)");
 async function main() {
   const pool = getPool();
   const repo = makePostgresRouteRepository(pool);
+  // quick connectivity check to provide a friendlier error when Postgres isn't available
+  try {
+    await pool.query("SELECT 1");
+  } catch (err: any) {
+    console.error("Postgres connection failed:", err?.message || err);
+    console.error("Hint: Start the database (docker-compose is provided in Backend/docker-compose.yml)");
+    console.error("Try: cd Backend && docker-compose up -d db");
+    process.exit(1);
+  }
 
   console.log("== findAll ==");
   const routes: Route[] = await repo.findAll();
